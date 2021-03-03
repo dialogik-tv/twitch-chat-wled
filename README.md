@@ -6,7 +6,22 @@ This web page listens to Twitch chat WLED commands that allow to control the WLE
 
 ## Setting color
 
-Say `!color RRGGBB` (or `#RRGGBB`) in [hexadecimal notation](https://en.wikipedia.org/wiki/Hexadecimal) in the [dialogikTV Twitch livestream chat](https://www.twitch.tv/dialogikTV) to set the primary color. This command currently only accepts the color value as a 6 character hexadecimal (`0-9` and `A-F`) string, optionally prefixed by a hash `#`.
+Say `!color RRGGBB` (or `#RRGGBB`) in [hexadecimal notation](https://en.wikipedia.org/wiki/Hexadecimal) or `!color R,G,B` where `R`, `G` and `B` must be a value between `0-255` to modify the primary color.
+
+You can see a live demo of this in the [dialogikTV Twitch livestream chat](https://www.twitch.tv/dialogikTV).
+
+## Examples
+
+HEX
+```
+!color 00acee (dialogikTV blue)
+!color #ee00ac (ping, note the optional # sign)
+```
+RGB
+```
+       R     G     B
+!color 0-255,0-255,0-255
+```
 
 ## Setting effects
 

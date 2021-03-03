@@ -31,13 +31,14 @@ chat.on('PRIVMSG', (message) => {
         //     return;
         // }
 
-        // Ensure color is hex value
-        if(color.length == 6) {
-            if(!(/^[0-9A-F]{6}$/i.test(color))) {
-                console.log(`[ERR] Denying color request, [${color}] is no hex value`);
-                return;
-            }
-            
+        // Check if color is hex value
+        if(/^[0-9A-F]{6}$/i.test(color)) {
+            fetch(`http://192.168.2.30/win&CL=h${color}`)
+                .then(() => console.log(`[SENT] Color request [${color}] sent`));
+        }
+        // Check if color is valid RGB statement (0-255,0-255,0-255)
+        else if(/(25[0-5]|2[0-4][0-9]|[1]?[0-9][0-9]?)\,(25[0-5]|2[0-4][0-9]|[1]?[0-9][0-9]?)\,(25[0-5]|2[0-4][0-9]|[1]?[0-9][0-9]?)/.test(color)) {
+            color = rgbToHex(color);
             fetch(`http://192.168.2.30/win&CL=h${color}`)
                 .then(() => console.log(`[SENT] Color request [${color}] sent`));
         } else {
@@ -79,3 +80,13 @@ chat.on('PRIVMSG', (message) => {
             });
     }
 });
+
+function componentToHex(c) {
+    var hex = parseInt(c).toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
+
+function rgbToHex(rgb) {
+    rgb = rgb.split(",");
+    return componentToHex(rgb[0]) + componentToHex(rgb[1]) + componentToHex(rgb[2]);
+}
