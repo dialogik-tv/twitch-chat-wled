@@ -15,7 +15,7 @@ You can see a live demo of this in the [dialogikTV Twitch livestream chat](https
 HEX
 ```
 !color 00acee (dialogikTV blue)
-!color #ee00ac (ping, note the optional # sign)
+!color #ee00ac (pink, note the optional # sign)
 ```
 RGB
 ```
