@@ -21,6 +21,10 @@ RGB
 ```
        R     G     B
 !color 0-255,0-255,0-255
+
+!color 255,0,0 (red)
+!color 255,0,255 (purple)
+!color 200,255,200 (light green)
 ```
 
 ## Setting effects
