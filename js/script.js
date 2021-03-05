@@ -50,7 +50,7 @@ chat.on('PRIVMSG', (message) => {
     else if(message == '!fx') {
         // Increase effect ID
         currentEffect = currentEffect + 1;
-        if(currentEffect > effects.length) {
+        if(currentEffect > Object.values(effects).length) {
             currentEffect = 1;
         }
 
