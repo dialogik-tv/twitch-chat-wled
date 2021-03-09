@@ -1,3 +1,5 @@
+import colors from './colors.js';
+
 const channel = 'dialogikTV';
 const { chat } = new window.TwitchJs({ channel });
 const effects = {
@@ -31,17 +33,26 @@ chat.on('PRIVMSG', (message) => {
         //     return;
         // }
 
-        // Check if color is hex value
-        if(/^[0-9A-F]{6}$/i.test(color)) {
+        // Color is text based an in list of CSS3 colors
+        if(color in colors) {
+            console.log('before', color)
+            color = colors[color];
+            console.log('after', color);
             fetch(`http://192.168.2.30/win&CL=h${color}`)
-                .then(() => console.log(`[SENT] Color request [${color}] sent`));
+                .then(() => console.log(`[SENT] Word color request [${color}] sent`));
+        }
+        // Check if color is hex value
+        else if(/^[0-9A-F]{6}$/i.test(color)) {
+            fetch(`http://192.168.2.30/win&CL=h${color}`)
+                .then(() => console.log(`[SENT] Hex color request [${color}] sent`));
         }
         // Check if color is valid RGB statement (0-255,0-255,0-255)
         else if(/(25[0-5]|2[0-4][0-9]|[1]?[0-9][0-9]?)\,(25[0-5]|2[0-4][0-9]|[1]?[0-9][0-9]?)\,(25[0-5]|2[0-4][0-9]|[1]?[0-9][0-9]?)/.test(color)) {
             color = rgbToHex(color);
             fetch(`http://192.168.2.30/win&CL=h${color}`)
-                .then(() => console.log(`[SENT] Color request [${color}] sent`));
-        } else {
+                .then(() => console.log(`[SENT] RGB color request [${color}] sent`));
+        }
+        else {
             console.log(`[ERR] No valid color [${color}] specified`);
         }
     }
