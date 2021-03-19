@@ -1,5 +1,7 @@
 import colors from './colors.js';
 
+const docBody = document.body;
+
 const channel = 'dialogikTV';
 const { chat } = new window.TwitchJs({ channel });
 const effects = {
@@ -23,7 +25,11 @@ chat.connect().then(() => {
 }).catch((e) => { console.error('Twitch error in Promise', e); });
 // chat.on('PRIVMSG', (message) => {
 chat.on('PRIVMSG', (message) => {
-    message = message.message;
+    const username = message.tags.displayName;
+
+    // Sanitize user input
+    message = JSON.parse(JSON.stringify(message.message));
+
     if(message.startsWith('!color ') && message != '!color ') {
         let color = message.replace('!color ', '').replace('#', '');
         console.log(`[REQ] Requested color [${color}]`);
@@ -35,25 +41,35 @@ chat.on('PRIVMSG', (message) => {
 
         // Color is text based an in list of CSS3 colors
         if(color in colors) {
-            console.log('before', color)
+            const colorName = color;
             color = colors[color];
-            console.log('after', color);
             fetch(`http://192.168.2.30/win&CL=h${color}`)
-                .then(() => console.log(`[SENT] Word color request [${color}] sent`));
+                .then(() => {
+                    console.log(`[SENT] Word color request [${color}] sent`);
+                    success(username, 'color', colorName);
+                });
         }
         // Check if color is hex value
         else if(/^[0-9A-F]{6}$/i.test(color)) {
             fetch(`http://192.168.2.30/win&CL=h${color}`)
-                .then(() => console.log(`[SENT] Hex color request [${color}] sent`));
+                .then(() => {
+                    console.log(`[SENT] Hex color request [${color}] sent`);
+                    success(username, 'color', '#'+color);
+                });
         }
         // Check if color is valid RGB statement (0-255,0-255,0-255)
         else if(/(25[0-5]|2[0-4][0-9]|[1]?[0-9][0-9]?)\,(25[0-5]|2[0-4][0-9]|[1]?[0-9][0-9]?)\,(25[0-5]|2[0-4][0-9]|[1]?[0-9][0-9]?)/.test(color)) {
+            const colorRgb = color;
             color = rgbToHex(color);
             fetch(`http://192.168.2.30/win&CL=h${color}`)
-                .then(() => console.log(`[SENT] RGB color request [${color}] sent`));
+            .then(() => {
+                console.log(`[SENT] RGB color request [${color}] sent`);
+                success(username, 'color', colorRgb);
+            });
         }
         else {
             console.log(`[ERR] No valid color [${color}] specified`);
+            // Todo: error();
         }
     }
 
@@ -65,11 +81,15 @@ chat.on('PRIVMSG', (message) => {
             currentEffect = 1;
         }
 
+        const keys = Object.keys(effects);
+        const currentKeyName = keys[currentEffect-1];
+
         console.log(`[REQ] Next effect requested [${currentEffect}]`);
 
         fetch(`http://192.168.2.30/win&PL=${currentEffect}`)
             .then(() => {
                 console.log(`[SENT] Effect [ID ${currentEffect}] request sent`);
+                success(username, 'fx', currentKeyName);
             });
     }
 
@@ -88,6 +108,7 @@ chat.on('PRIVMSG', (message) => {
         fetch(`http://192.168.2.30/win&PL=${effectId}`)
             .then(() => {
                 console.log(`[SENT] Effect [${effect}] [ID ${effectId}] request sent`);
+                success(username, 'fx', effect);
             });
     }
 });
@@ -100,4 +121,52 @@ function componentToHex(c) {
 function rgbToHex(rgb) {
     rgb = rgb.split(",");
     return componentToHex(rgb[0]) + componentToHex(rgb[1]) + componentToHex(rgb[2]);
+}
+
+function success(username, type, input) {
+    // Get feedback info element
+    const holder = document.createElement('div');
+    holder.id = 'feedback-info';
+    holder.classList.add('animate__animated');
+
+    // User username to feedback info
+    const userlabel = `<span class="username">${username}</span>`;
+    holder.innerHTML = userlabel;
+
+    // Handle effect requests
+    if(type == 'fx') {
+        const fxHolder = document.createElement('span');
+        fxHolder.classList.add('fx');
+        fxHolder.innerText = input;
+        holder.append(fxHolder);
+    // Handle color requests
+    } else {
+        // Color element
+        const colorHolder = document.createElement('span');
+        colorHolder.classList.add('color');
+
+        // Color square element (color preview)
+        const colorSquare = document.createElement('div');
+        colorSquare.classList.add('color-square');
+        colorSquare.style.backgroundColor = input;
+
+        // Add requested color to output
+        colorHolder.innerText = input;
+        colorHolder.prepend(colorSquare);
+
+        // Append result to feedback info element
+        holder.append(colorHolder);
+    }
+
+    // Show result
+    holder.classList.add('animate__backInRight');
+    holder.style.display = 'block';
+    docBody.append(holder);
+
+    // Hide result after 3 secs
+    setTimeout(function() {
+        holder.classList.remove('animate__backInRight');
+        holder.classList.add('animate__backOutRight');
+        holder.remove();
+    }, 3000);
 }
