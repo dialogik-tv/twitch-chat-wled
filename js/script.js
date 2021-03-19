@@ -167,6 +167,8 @@ function success(username, type, input) {
     setTimeout(function() {
         holder.classList.remove('animate__backInRight');
         holder.classList.add('animate__backOutRight');
-        holder.remove();
+        setTimeout(function() {
+            holder.remove();
+        }, 1000);
     }, 3000);
 }
