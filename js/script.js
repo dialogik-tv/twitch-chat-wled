@@ -69,7 +69,7 @@ chat.on('PRIVMSG', (message) => {
         }
         else {
             console.log(`[ERR] No valid color [${color}] specified`);
-            // Todo: error();
+            error('Ungültige Farbe');
         }
     }
 
@@ -97,8 +97,9 @@ chat.on('PRIVMSG', (message) => {
     else if(message.startsWith('!fx') && message != '!fx ') {
         let effect = message.replace('!fx ', '');
         console.log(`[REQ] Requested effect [${effect}]`);
-        if(!effect in effects) {
+        if(!(effect in effects)) {
             console.log(`[ERR] Denying effect request, [${effect}] is no valid effect`);
+            error('Ungültiger Effekt');
             return;
         }
 
@@ -124,7 +125,7 @@ function rgbToHex(rgb) {
 }
 
 function success(username, type, input) {
-    // Get feedback info element
+    // Feedback div element
     const holder = document.createElement('div');
     holder.id = 'feedback-info';
     holder.classList.add('animate__animated');
@@ -160,7 +161,6 @@ function success(username, type, input) {
 
     // Show result
     holder.classList.add('animate__backInRight');
-    holder.style.display = 'block';
     docBody.append(holder);
 
     // Hide result after 3 secs
@@ -168,6 +168,31 @@ function success(username, type, input) {
         holder.classList.remove('animate__backInRight');
         holder.classList.add('animate__backOutRight');
         setTimeout(function() {
+            holder.remove();
+        }, 1000);
+    }, 3000);
+}
+
+function error(text) {
+    // Feedback div element
+    const holder = document.createElement('div');
+    holder.id = 'feedback-info';
+    holder.classList.add('animate__animated');
+
+    // Get feedback info element
+    holder.classList.add('error');
+    holder.innerHTML = `<span class="error-details">${text}</span><span class="error-meta">siehe !wled</span>`;
+
+    // Show result
+    holder.classList.add('animate__backInRight');
+    docBody.append(holder);
+
+    // Hide result after 3 secs
+    setTimeout(function() {
+        holder.classList.remove('animate__backInRight');
+        holder.classList.add('animate__backOutRight');
+        setTimeout(function() {
+            holder.classList.remove('error');
             holder.remove();
         }, 1000);
     }, 3000);
