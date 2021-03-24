@@ -46,7 +46,7 @@ chat.on('PRIVMSG', (message) => {
             fetch(`http://192.168.2.30/win&CL=h${color}`)
                 .then(() => {
                     console.log(`[SENT] Word color request [${color}] sent`);
-                    success(username, 'color', colorName);
+                    success(username, 'colorname', colorName);
                 });
         }
         // Check if color is hex value
@@ -54,7 +54,7 @@ chat.on('PRIVMSG', (message) => {
             fetch(`http://192.168.2.30/win&CL=h${color}`)
                 .then(() => {
                     console.log(`[SENT] Hex color request [${color}] sent`);
-                    success(username, 'color', '#'+color);
+                    success(username, 'hex', '#'+color);
                 });
         }
         // Check if color is valid RGB statement (0-255,0-255,0-255)
@@ -64,7 +64,7 @@ chat.on('PRIVMSG', (message) => {
             fetch(`http://192.168.2.30/win&CL=h${color}`)
             .then(() => {
                 console.log(`[SENT] RGB color request [${color}] sent`);
-                success(username, 'color', colorRgb);
+                success(username, 'rgb', colorRgb);
             });
         }
         else {
@@ -149,7 +149,12 @@ function success(username, type, input) {
         // Color square element (color preview)
         const colorSquare = document.createElement('div');
         colorSquare.classList.add('color-square');
-        colorSquare.style.backgroundColor = input;
+        if(type === 'rgb') {
+            colorSquare.style.backgroundColor = `rgb(${input})`;
+        } else {
+            colorSquare.style.backgroundColor = input;
+        }
+        
 
         // Add requested color to output
         colorHolder.innerText = input;
